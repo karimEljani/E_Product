@@ -1,0 +1,71 @@
+@model TP_Product.ViewModels.EditViewModel
+@{
+    ViewData["Title"] = "Edit";
+    // Chemin complet de l'image existante
+    var photoPath = "~/images/" + (Model.ExistingImagePath ?? "noimage.jpg");
+}
+
+<h1>Edit</h1>
+<h4>Product</h4>
+<hr />
+
+<form asp-controller="Product" asp-action="Edit" enctype="multipart/form-data" method="post" class="mt-3">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    @*Champs cachés nécessaires à la mise à jour*@
+    <input hidden asp-for="ProductId" />
+    <input hidden asp-for="ExistingImagePath" />
+
+    <div class="form-group mb-2">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Price" class="control-label"></label>
+        <input asp-for="Price" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="QteStock" class="control-label"></label>
+        <input asp-for="QteStock" class="form-control" />
+        <span asp-validation-for="QteStock" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="CategoryId" class="control-label"></label>
+        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="ImagePath" class="control-label">Image : (laisser vide pour conserver l'actuelle)</label>
+        <input asp-for="ImagePath" class="custom-file-input form-control" id="imageInput" />
+    </div>
+
+    @* Affichage de l'image existante / prévisualisation *@
+    <div class="form-group mb-3">
+        <img id="imageEmp" src="@photoPath" asp-append-version="true" height="100" width="100" />
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a asp-action="Index" asp-controller="Product" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                if (this.files && this.files[0]) {
+                    // Mise à jour de l'image de prévisualisation
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#imageEmp').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+    </script>
+}
